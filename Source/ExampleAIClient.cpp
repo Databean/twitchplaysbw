@@ -10,6 +10,7 @@
 
 #include "IRCClient.h"
 #include "Thread.h"
+#include "Mutex.h"
 
 #include <windows.h>
 
@@ -20,7 +21,7 @@ using namespace BWAPI;
 void initialMining();
 void handleMessage(const IRCMessage& message, IRCClient& client);
 
-HANDLE ghMutex; 
+Mutex mutex;
 
 void reconnect()
 {
@@ -28,16 +29,6 @@ void reconnect()
 	{
 		Sleep(1000);
 	}
-}
-
-void lock() {
-	WaitForSingleObject( 
-				ghMutex,    // handle to mutex
-				INFINITE);  // no time-out interval
-}
-
-void unlock() {
-	ReleaseMutex(ghMutex);
 }
 
 void clientThread(void* v_client) {
@@ -48,18 +39,7 @@ void clientThread(void* v_client) {
 	}
 }
 
-int main(int argc, const char* argv[])
-{
-	ghMutex = CreateMutex( 
-		NULL,              // default security attributes
-		FALSE,             // initially not owned
-		NULL);             // unnamed mutex
-
-	if (ghMutex == NULL) 
-    {
-        printf("CreateMutex error: %d\n", GetLastError());
-        return 1;
-    }
+int main(int argc, const char* argv[]) {
 
 	std::string host = "irc.freenode.net";
 	int port = 8000;
@@ -92,7 +72,7 @@ int main(int argc, const char* argv[])
 	reconnect();
 	while(true)
 	{
-		lock();
+		mutex.lock();
 
 		std::cout << "waiting to enter match" << std::endl;
 		while ( !Broodwar->isInGame() )
@@ -118,10 +98,10 @@ int main(int argc, const char* argv[])
 
 		bool running = Broodwar->isInGame();
 
-		unlock();
+		mutex.unlock();
 
 		while(running) {
-			lock();
+			LockGuard guard(mutex);
 			
 			running = Broodwar->isInGame();
 
@@ -131,7 +111,6 @@ int main(int argc, const char* argv[])
 				std::cout << "Reconnecting..." << std::endl;
 				reconnect();
 			}
-			unlock();
 		}
 		std::cout << "Game ended" << std::endl;
 	}
@@ -261,8 +240,8 @@ void buildAtClosestLocation(Unit worker, UnitType type) {
 
 void handleMessage(const IRCMessage& message, IRCClient& client) {
 	std::string text = message.parameters.at(message.parameters.size() - 1);
+	LockGuard guard(mutex);
 	if(text == "build worker") {
-		lock();
 		Unitset units = Broodwar->self()->getUnits();
 		units.remove_if([](Unit i) { return !i->getType().isResourceDepot(); });
 		if(units.size() > 0) {
@@ -270,9 +249,7 @@ void handleMessage(const IRCMessage& message, IRCClient& client) {
 			u->train(Broodwar->self()->getRace().getWorker());
 			centerCameraOnUnit(u);
 		}
-		unlock();
 	} else if(text == "send idle workers to mine") {
-		lock();
 		Unitset units = Broodwar->self()->getUnits();
 		for(auto it = units.begin(); it != units.end(); it++) {
 			if(it->getType().isWorker() && it->isIdle()) {
@@ -280,9 +257,7 @@ void handleMessage(const IRCMessage& message, IRCClient& client) {
 				centerCameraOnUnit(*it);
 			}
 		}
-		unlock();
 	} else if(text == "build supply depot") {
-		lock();
 		Unitset units = Broodwar->self()->getUnits();
 		// Get all our workers
 		units.remove_if([](Unit i) { return !i->getType().isWorker(); });
@@ -295,9 +270,7 @@ void handleMessage(const IRCMessage& message, IRCClient& client) {
 			buildAtClosestLocation(worker, UnitTypes::Terran_Supply_Depot);
 			centerCameraOnUnit(worker);
 		}
-		unlock();
 	} else if(text == "build barracks") {
-		lock();
 		Unitset units = Broodwar->self()->getUnits();
 		// Get all our workers
 		units.remove_if([](Unit i) { return !i->getType().isWorker(); });
@@ -310,9 +283,7 @@ void handleMessage(const IRCMessage& message, IRCClient& client) {
 			buildAtClosestLocation(worker, UnitTypes::Terran_Barracks);
 			centerCameraOnUnit(worker);
 		}
-		unlock();
 	} else if(text == "build marine") {
-		lock();
 		Unitset units = Broodwar->self()->getUnits();
 		units.remove_if([](Unit i) { return i->getType().getID() != UnitTypes::Terran_Barracks; });
 		if(units.size() > 0) {
@@ -321,9 +292,7 @@ void handleMessage(const IRCMessage& message, IRCClient& client) {
 				centerCameraOnUnit(barracks);
 			}
 		}
-		unlock();
 	} else if(text == "yolo marines") {
-		lock();
 		Unitset units = Broodwar->self()->getUnits();
 		units.remove_if([](Unit i) { return i->getType().getID() != UnitTypes::Terran_Marine; });
 		
@@ -342,7 +311,6 @@ void handleMessage(const IRCMessage& message, IRCClient& client) {
 		} else {
 			std::cout << "nothing to attack" << std::endl;
 		}
-		unlock();
 	}
 }
 
