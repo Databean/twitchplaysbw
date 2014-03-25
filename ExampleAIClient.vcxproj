@@ -92,12 +92,14 @@
     <ClCompile Include="Source\IRCClient.cpp" />
     <ClCompile Include="Source\IRCHandler.cpp" />
     <ClCompile Include="Source\IRCSocket.cpp" />
+    <ClCompile Include="Source\Mutex.cpp" />
     <ClCompile Include="Source\Thread.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\IRCClient.h" />
     <ClInclude Include="Source\IRCHandler.h" />
     <ClInclude Include="Source\IRCSocket.h" />
+    <ClInclude Include="Source\Mutex.h" />
     <ClInclude Include="Source\Thread.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
