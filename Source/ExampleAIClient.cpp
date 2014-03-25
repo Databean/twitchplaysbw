@@ -18,7 +18,7 @@
 using namespace BWAPI;
 
 void initialMining();
-void handleMessage(IRCMessage message, IRCClient* client);
+void handleMessage(const IRCMessage& message, IRCClient& client);
 
 HANDLE ghMutex; 
 
@@ -259,7 +259,7 @@ void buildAtClosestLocation(Unit worker, UnitType type) {
 	}
 }
 
-void handleMessage(IRCMessage message, IRCClient* client) {
+void handleMessage(const IRCMessage& message, IRCClient& client) {
 	std::string text = message.parameters.at(message.parameters.size() - 1);
 	if(text == "build worker") {
 		lock();

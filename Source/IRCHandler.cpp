@@ -47,7 +47,7 @@ IRCCommandHandler ircCommandTable[NUM_IRC_CMDS] =
     { "439",                &IRCClient::HandleServerMessage             },
 };
 
-void IRCClient::HandleCTCP(IRCMessage message)
+void IRCClient::HandleCTCP(const IRCMessage& message)
 {
     std::string to = message.parameters.at(0);
     std::string text = message.parameters.at(message.parameters.size() - 1);
@@ -70,7 +70,7 @@ void IRCClient::HandleCTCP(IRCMessage message)
     }
 }
 
-void IRCClient::HandlePrivMsg(IRCMessage message)
+void IRCClient::HandlePrivMsg(const IRCMessage& message)
 {
     std::string to = message.parameters.at(0);
     std::string text = message.parameters.at(message.parameters.size() - 1);
@@ -88,7 +88,7 @@ void IRCClient::HandlePrivMsg(IRCMessage message)
         std::cout << "From " + message.prefix.nick << ": " << text << std::endl;
 }
 
-void IRCClient::HandleNotice(IRCMessage message)
+void IRCClient::HandleNotice(const IRCMessage& message)
 {
     std::string from = message.prefix.nick != "" ? message.prefix.nick : message.prefix.prefix;
     std::string text = message.parameters.at(message.parameters.size() - 1);
@@ -108,38 +108,38 @@ void IRCClient::HandleNotice(IRCMessage message)
         std::cout << "-" << from << "- " << text << std::endl;
 }
 
-void IRCClient::HandleChannelJoinPart(IRCMessage message)
+void IRCClient::HandleChannelJoinPart(const IRCMessage& message)
 {
     std::string channel = message.parameters.at(0);
     std::string action = message.command == "JOIN" ? "joins" : "leaves";
     std::cout << message.prefix.nick << " " << action << " " << channel << std::endl;
 }
 
-void IRCClient::HandleUserNickChange(IRCMessage message)
+void IRCClient::HandleUserNickChange(const IRCMessage& message)
 {
     std::string newNick = message.parameters.at(0);
     std::cout << message.prefix.nick << " changed his nick to " << newNick << std::endl;
 }
 
-void IRCClient::HandleUserQuit(IRCMessage message)
+void IRCClient::HandleUserQuit(const IRCMessage& message)
 {
     std::string text = message.parameters.at(0);
     std::cout << message.prefix.nick << " quits (" << text << ")" << std::endl;
 }
 
-void IRCClient::HandleChannelNamesList(IRCMessage message)
+void IRCClient::HandleChannelNamesList(const IRCMessage& message)
 {
     std::string channel = message.parameters.at(2);
     std::string nicks = message.parameters.at(3);
     std::cout << "People on " << channel << ":" << std::endl << nicks << std::endl;
 }
 
-void IRCClient::HandleNicknameInUse(IRCMessage message)
+void IRCClient::HandleNicknameInUse(const IRCMessage& message)
 {
     std::cout << message.parameters.at(1) << " " << message.parameters.at(2) << std::endl;
 }
 
-void IRCClient::HandleServerMessage(IRCMessage message)
+void IRCClient::HandleServerMessage(const IRCMessage& message)
 {
     std::vector<std::string>::const_iterator itr = message.parameters.begin();
     ++itr; // skip the first parameter (our nick)

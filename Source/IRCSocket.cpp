@@ -21,6 +21,8 @@
 
 #define MAXDATASIZE 4096
 
+using std::string;
+
 bool IRCSocket::Init()
 {
     #ifdef _WIN32
@@ -62,11 +64,11 @@ bool IRCSocket::Init()
     return true;
 }
 
-bool IRCSocket::Connect(char const* host, int port)
+bool IRCSocket::Connect(const string& host, int port)
 {
     hostent* he;
 
-    if (!(he = gethostbyname(host)))
+    if (!(he = gethostbyname(host.c_str())))
     {
         std::cout << "Could not resolve host: " << host << std::endl;
         #ifdef _WIN32
@@ -106,10 +108,10 @@ void IRCSocket::Disconnect()
     }
 }
 
-bool IRCSocket::SendData(char const* data)
+bool IRCSocket::SendData(const string& data)
 {
     if (_connected)
-        if (send(_socket, data, strlen(data), 0) == -1)
+        if (send(_socket, data.c_str(), data.length(), 0) == -1)
             return false;
 
     return true;

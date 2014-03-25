@@ -25,11 +25,11 @@
 
 class IRCClient;
 
-extern std::vector<std::string> split(std::string const&, char);
+extern std::vector<std::string> split(const std::string&, char);
 
 struct IRCCommandPrefix
 {
-    void Parse(std::string data)
+    void Parse(const std::string& data)
     {
         if (data == "")
             return;
@@ -60,7 +60,7 @@ struct IRCCommandPrefix
 struct IRCMessage
 {
     IRCMessage();
-    IRCMessage(std::string cmd, IRCCommandPrefix p, std::vector<std::string> params) :
+    IRCMessage(const std::string& cmd, IRCCommandPrefix p, const std::vector<std::string>& params) :
         command(cmd), prefix(p), parameters(params) {};
 
     std::string command;
@@ -73,7 +73,7 @@ struct IRCCommandHook
     IRCCommandHook() : function(NULL) {};
 
     std::string command;
-    void (*function)(IRCMessage /*message*/, IRCClient* /*client*/);
+    void (*function)(const IRCMessage& /*message*/, IRCClient& /*client*/);
 };
 
 class IRCClient
@@ -82,37 +82,37 @@ public:
     IRCClient() : _debug(false) {};
 
     bool InitSocket();
-    bool Connect(const char* /*host*/, int /*port*/);
+    bool Connect(const std::string& /*host*/, int /*port*/);
     void Disconnect();
     bool Connected() { return _socket.Connected(); };
 
-    bool SendIRC(std::string /*data*/);
+    bool SendIRC(const std::string& /*data*/);
 
-    bool Login(std::string /*nick*/, std::string /*user*/);
+    bool Login(const std::string& /*nick*/, const std::string& /*user*/);
 
     void ReceiveData();
 
-    void HookIRCCommand(std::string /*command*/, void (*function)(IRCMessage /*message*/, IRCClient* /*client*/));
+    void HookIRCCommand(const std::string& /*command*/, void (*function)(const IRCMessage& /*message*/, IRCClient& /*client*/));
 
-    void Parse(std::string /*data*/);
+    void Parse(const std::string& /*data*/);
 
-    void HandleCTCP(IRCMessage /*message*/);
+    void HandleCTCP(const IRCMessage& /*message*/);
 
     // Default internal handlers
-    void HandlePrivMsg(IRCMessage /*message*/);
-    void HandleNotice(IRCMessage /*message*/);
-    void HandleChannelJoinPart(IRCMessage /*message*/);
-    void HandleUserNickChange(IRCMessage /*message*/);
-    void HandleUserQuit(IRCMessage /*message*/);
-    void HandleChannelNamesList(IRCMessage /*message*/);
-    void HandleNicknameInUse(IRCMessage /*message*/);
-    void HandleServerMessage(IRCMessage /*message*/);
+    void HandlePrivMsg(const IRCMessage& /*message*/);
+    void HandleNotice(const IRCMessage& /*message*/);
+    void HandleChannelJoinPart(const IRCMessage& /*message*/);
+    void HandleUserNickChange(const IRCMessage& /*message*/);
+    void HandleUserQuit(const IRCMessage& /*message*/);
+    void HandleChannelNamesList(const IRCMessage& /*message*/);
+    void HandleNicknameInUse(const IRCMessage& /*message*/);
+    void HandleServerMessage(const IRCMessage& /*message*/);
 
     void Debug(bool debug) { _debug = debug; };
 
 private:
-    void HandleCommand(IRCMessage /*message*/);
-    void CallHook(std::string /*command*/, IRCMessage /*message*/);
+    void HandleCommand(const IRCMessage& /*message*/);
+    void CallHook(const std::string& /*command*/, const IRCMessage& /*message*/);
 
     IRCSocket _socket;
 
