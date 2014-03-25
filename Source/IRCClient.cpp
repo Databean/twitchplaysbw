@@ -20,22 +20,10 @@
 #include "IRCSocket.h"
 #include "IRCClient.h"
 #include "IRCHandler.h"
+#include "StringOperations.h"
 
 using std::string;
 using std::vector;
-
-vector<string> split(const string& text, char sep)
-{
-    vector<string> tokens;
-    size_t start = 0, end = 0;
-    while ((end = text.find(sep, start)) != string::npos)
-    {
-        tokens.push_back(text.substr(start, end - start));
-        start = end + 1;
-    }
-    tokens.push_back(text.substr(start));
-    return tokens;
-}
 
 bool IRCClient::InitSocket()
 {
@@ -157,12 +145,12 @@ void IRCClient::Parse(const string& _data)
     CallHook(command, ircMessage);
 }
 
-void IRCClient::HookIRCCommand(const string& command, void (*function)(const IRCMessage& /*message*/, IRCClient& /*client*/))
+void IRCClient::HookIRCCommand(const string& command, std::function<void(const IRCMessage&, IRCClient&)>&& function)
 {
     IRCCommandHook hook;
 
     hook.command = command;
-    hook.function = function;
+    hook.function = std::move(function);
 
     _hooks.push_back(hook);
 }
@@ -176,7 +164,7 @@ void IRCClient::CallHook(const string& command, const IRCMessage& message)
     {
         if (itr->command == command)
         {
-            (*(itr->function))(message, *this);
+            itr->function(message, *this);
             break;
         }
     }

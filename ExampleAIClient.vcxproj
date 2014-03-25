@@ -88,19 +88,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\CameraControl.cpp" />
+    <ClCompile Include="Source\ChatControl.cpp" />
     <ClCompile Include="Source\ExampleAIClient.cpp" />
     <ClCompile Include="Source\IRCClient.cpp" />
     <ClCompile Include="Source\IRCHandler.cpp" />
     <ClCompile Include="Source\IRCSocket.cpp" />
     <ClCompile Include="Source\Mutex.cpp" />
+    <ClCompile Include="Source\StringOperations.cpp" />
     <ClCompile Include="Source\Thread.cpp" />
+    <ClCompile Include="Source\WorkerControl.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\CameraControl.h" />
+    <ClInclude Include="Source\ChatControl.h" />
     <ClInclude Include="Source\IRCClient.h" />
     <ClInclude Include="Source\IRCHandler.h" />
     <ClInclude Include="Source\IRCSocket.h" />
     <ClInclude Include="Source\Mutex.h" />
+    <ClInclude Include="Source\StringOperations.h" />
     <ClInclude Include="Source\Thread.h" />
+    <ClInclude Include="Source\WorkerControl.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

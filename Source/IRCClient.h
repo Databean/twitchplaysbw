@@ -21,11 +21,11 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <functional>
 #include "IRCSocket.h"
+#include "StringOperations.h"
 
 class IRCClient;
-
-extern std::vector<std::string> split(const std::string&, char);
 
 struct IRCCommandPrefix
 {
@@ -73,7 +73,7 @@ struct IRCCommandHook
     IRCCommandHook() : function(NULL) {};
 
     std::string command;
-    void (*function)(const IRCMessage& /*message*/, IRCClient& /*client*/);
+    std::function<void(const IRCMessage&, IRCClient&)> function;
 };
 
 class IRCClient
@@ -92,7 +92,7 @@ public:
 
     void ReceiveData();
 
-    void HookIRCCommand(const std::string& /*command*/, void (*function)(const IRCMessage& /*message*/, IRCClient& /*client*/));
+    void HookIRCCommand(const std::string& /*command*/, std::function<void(const IRCMessage&, IRCClient&)>&& function);
 
     void Parse(const std::string& /*data*/);
 
