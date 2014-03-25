@@ -89,6 +89,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\CameraControl.cpp" />
+    <ClCompile Include="Source\ChatControl.cpp" />
     <ClCompile Include="Source\ExampleAIClient.cpp" />
     <ClCompile Include="Source\IRCClient.cpp" />
     <ClCompile Include="Source\IRCHandler.cpp" />
@@ -100,6 +101,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\CameraControl.h" />
+    <ClInclude Include="Source\ChatControl.h" />
     <ClInclude Include="Source\IRCClient.h" />
     <ClInclude Include="Source\IRCHandler.h" />
     <ClInclude Include="Source\IRCSocket.h" />

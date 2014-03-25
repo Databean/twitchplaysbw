@@ -145,12 +145,12 @@ void IRCClient::Parse(const string& _data)
     CallHook(command, ircMessage);
 }
 
-void IRCClient::HookIRCCommand(const string& command, std::function<void(const IRCMessage&, IRCClient&)> function)
+void IRCClient::HookIRCCommand(const string& command, std::function<void(const IRCMessage&, IRCClient&)>&& function)
 {
     IRCCommandHook hook;
 
     hook.command = command;
-    hook.function = function;
+    hook.function = std::move(function);
 
     _hooks.push_back(hook);
 }

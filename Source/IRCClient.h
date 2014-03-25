@@ -92,7 +92,7 @@ public:
 
     void ReceiveData();
 
-    void HookIRCCommand(const std::string& /*command*/, std::function<void(const IRCMessage&, IRCClient&)> function);
+    void HookIRCCommand(const std::string& /*command*/, std::function<void(const IRCMessage&, IRCClient&)>&& function);
 
     void Parse(const std::string& /*data*/);
 
