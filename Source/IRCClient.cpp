@@ -145,7 +145,7 @@ void IRCClient::Parse(const string& _data)
     CallHook(command, ircMessage);
 }
 
-void IRCClient::HookIRCCommand(const string& command, void (*function)(const IRCMessage& /*message*/, IRCClient& /*client*/))
+void IRCClient::HookIRCCommand(const string& command, std::function<void(const IRCMessage&, IRCClient&)> function)
 {
     IRCCommandHook hook;
 
@@ -164,7 +164,7 @@ void IRCClient::CallHook(const string& command, const IRCMessage& message)
     {
         if (itr->command == command)
         {
-            (*(itr->function))(message, *this);
+            itr->function(message, *this);
             break;
         }
     }
