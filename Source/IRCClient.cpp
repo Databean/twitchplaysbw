@@ -21,11 +21,14 @@
 #include "IRCClient.h"
 #include "IRCHandler.h"
 
-std::vector<std::string> split(std::string const& text, char sep)
+using std::string;
+using std::vector;
+
+vector<string> split(const string& text, char sep)
 {
-    std::vector<std::string> tokens;
+    vector<string> tokens;
     size_t start = 0, end = 0;
-    while ((end = text.find(sep, start)) != std::string::npos)
+    while ((end = text.find(sep, start)) != string::npos)
     {
         tokens.push_back(text.substr(start, end - start));
         start = end + 1;
@@ -39,7 +42,7 @@ bool IRCClient::InitSocket()
     return _socket.Init();
 }
 
-bool IRCClient::Connect(const char* host, int port)
+bool IRCClient::Connect(const string& host, int port)
 {
     return _socket.Connect(host, port);
 }
@@ -49,13 +52,11 @@ void IRCClient::Disconnect()
     _socket.Disconnect();
 }
 
-bool IRCClient::SendIRC(std::string data)
-{
-    data.append("\n");
-    return _socket.SendData(data.c_str());
+bool IRCClient::SendIRC(const string& data) {
+    return _socket.SendData(data + "\n");
 }
 
-bool IRCClient::Login(std::string nick, std::string user)
+bool IRCClient::Login(const string& nick, const string& user)
 {
     _nick = nick;
     _user = user;
@@ -82,9 +83,10 @@ void IRCClient::ReceiveData()
     }
 }
 
-void IRCClient::Parse(std::string data)
+void IRCClient::Parse(const string& _data)
 {
-    std::string original(data);
+	string data(_data);
+    string original(data);
     IRCCommandPrefix cmdPrefix;
 
     // if command has prefix
@@ -94,7 +96,7 @@ void IRCClient::Parse(std::string data)
         data = data.substr(data.find(" ") + 1);
     }
 
-    std::string command = data.substr(0, data.find(" "));
+    string command = data.substr(0, data.find(" "));
     std::transform(command.begin(), command.end(), command.begin(), towupper);
     if (data.find(" ") != std::string::npos)
         data = data.substr(data.find(" ") + 1);
@@ -155,7 +157,7 @@ void IRCClient::Parse(std::string data)
     CallHook(command, ircMessage);
 }
 
-void IRCClient::HookIRCCommand(std::string command, void (*function)(IRCMessage /*message*/, IRCClient* /*client*/))
+void IRCClient::HookIRCCommand(const string& command, void (*function)(const IRCMessage& /*message*/, IRCClient& /*client*/))
 {
     IRCCommandHook hook;
 
@@ -165,7 +167,7 @@ void IRCClient::HookIRCCommand(std::string command, void (*function)(IRCMessage 
     _hooks.push_back(hook);
 }
 
-void IRCClient::CallHook(std::string command, IRCMessage message)
+void IRCClient::CallHook(const string& command, const IRCMessage& message)
 {
     if (_hooks.empty())
         return;
@@ -174,7 +176,7 @@ void IRCClient::CallHook(std::string command, IRCMessage message)
     {
         if (itr->command == command)
         {
-            (*(itr->function))(message, this);
+            (*(itr->function))(message, *this);
             break;
         }
     }

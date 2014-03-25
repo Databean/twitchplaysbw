@@ -25,12 +25,12 @@
 struct IRCCommandHandler
 {
     std::string command;
-    void (IRCClient::*handler)(IRCMessage /*message*/);
+    void (IRCClient::*handler)(const IRCMessage& /*message*/);
 };
 
 extern IRCCommandHandler ircCommandTable[NUM_IRC_CMDS];
 
-inline int const GetCommandHandler(std::string command)
+inline int const GetCommandHandler(const std::string& command)
 {
     for (int i = 0; i < NUM_IRC_CMDS; ++i)
     {

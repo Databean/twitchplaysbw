@@ -38,12 +38,12 @@ class IRCSocket
 public:
     bool Init();
 
-    bool Connect(char const* host, int port);
+    bool Connect(const std::string& host, int port);
     void Disconnect();
 
     bool Connected() { return _connected; };
 
-    bool SendData(char const* data);
+    bool SendData(const std::string& data);
     std::string ReceiveData();
 
 private:
