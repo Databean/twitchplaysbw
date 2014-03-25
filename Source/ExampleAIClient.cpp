@@ -11,6 +11,8 @@
 #include "IRCClient.h"
 #include "Thread.h"
 #include "Mutex.h"
+#include "WorkerControl.h"
+#include "CameraControl.h"
 
 #include <windows.h>
 
@@ -117,125 +119,6 @@ int main(int argc, const char* argv[]) {
 	std::cout << "Press ENTER to continue..." << std::endl;
 	std::cin.ignore();
 	return 0;
-}
-
-void centerCameraOnPoint(Position p) {
-	if(p == Positions::Unknown) {
-		return;
-	}
-	Broodwar->setScreenPosition(p - Position(300, 200)); //experimental testing
-}
-
-void centerCameraOnUnit(UnitInterface* unit) {
-	if(!unit) {
-		return;
-	}
-	Position p = unit->getPosition();
-	if(p == Positions::Unknown) {
-		return;
-	}
-	centerCameraOnPoint(p);
-}
-
-void initialMining() {
-	//send each worker to the mineral field that is closest to it
-	Unitset units    = Broodwar->self()->getUnits();
-	Unitset minerals  = Broodwar->getMinerals();
-	for ( Unitset::iterator i = units.begin(); i != units.end(); ++i )
-	{
-		if ( i->getType().isWorker() )
-		{
-			Unit closestMineral = NULL;
-
-			for( Unitset::iterator m = minerals.begin(); m != minerals.end(); ++m )
-			{
-				if ( !closestMineral || i->getDistance(*m) < i->getDistance(closestMineral))
-					closestMineral = *m;
-			}
-			if ( closestMineral )
-				i->rightClick(closestMineral);
-		}
-		else if ( i->getType().isResourceDepot() )
-		{
-			//if this is a center, tell it to build the appropiate type of worker
-			i->train(Broodwar->self()->getRace().getWorker());
-		}
-	}
-}
-
-bool strBeginsWith(const std::string& str, const std::string& begin) {
-	return str.substr(0, begin.size()) == begin;
-}
-
-std::vector<std::string> strSplit(const std::string& str, char splitOn) {
-	std::vector<std::string> ret;
-	std::string current;
-	for(std::size_t i = 0; i < str.size(); i++) {
-		if(str[i] == splitOn) {
-			ret.push_back(current);
-			current = "";
-		} else {
-			current.push_back(str[i]);
-		}
-	}
-	ret.push_back(current);
-	return std::move(ret);
-}
-
-bool buildAtLocation(Unit worker, UnitType type, TilePosition tile) {
-	if(worker->canBuild(type, tile)) {
-		Broodwar->drawCircle(CoordinateType::Map, tile.x * 32, tile.y * 32, 1.2 * std::max(type.width(), type.height()), Color(255, 0 , 0));
-		Unitset closestOtherUnits = Broodwar->getUnitsInRadius(tile.x * 32, tile.y * 32, 1.2 * std::max(type.width(), type.height()));
-		closestOtherUnits.remove_if([worker](Unit u) { return u == worker; });
-		if(closestOtherUnits.size() == 0) {
-			return worker->build(type, tile);
-		}
-	}
-	return false;
-}
-
-void buildAtClosestLocation(Unit worker, UnitType type) {
-	TilePosition tile = worker->getTilePosition();
-	if(buildAtLocation(worker, type, tile)) {
-		std::cout << "built successfully!" << std::endl;
-		return;
-	}
-	for(int radius = 1; radius < 200; radius++) {
-		//Spiral out
-		tile.x++;
-		for(int j = 0; j < radius; j++) {
-			tile.x--;
-			tile.y--;
-			if(buildAtLocation(worker, type, tile)) {
-				std::cout << "built successfully!" << std::endl;
-				return;
-			}
-		}
-		for(int j = 0; j < radius; j++) {
-			tile.x--;
-			tile.y++;
-			if(buildAtLocation(worker, type, tile)) {
-				std::cout << "built successfully!" << std::endl;
-				return;
-			}
-		}
-		for(int j = 0; j < radius; j++) {
-			tile.x++;
-			tile.y++;
-			if(buildAtLocation(worker, type, tile)) {
-				std::cout << "built successfully!" << std::endl;
-				return;
-			}
-		}
-		for(int j = 0; j < radius; j++) {
-			tile.x++;
-			tile.y--;
-			if(buildAtLocation(worker, type, tile)) {
-				std::cout << "built successfully!" << std::endl;
-				return;
-			}
-		}
-	}
 }
 
 void handleMessage(const IRCMessage& message, IRCClient& client) {

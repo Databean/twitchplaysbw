@@ -22,10 +22,9 @@
 #include <vector>
 #include <list>
 #include "IRCSocket.h"
+#include "StringOperations.h"
 
 class IRCClient;
-
-extern std::vector<std::string> split(const std::string&, char);
 
 struct IRCCommandPrefix
 {
